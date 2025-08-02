@@ -5,7 +5,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Build output
-dist/
+# dist/  # Commented out to include dist in repository for GitHub Actions
 build/
 
 # Environment variables

@@ -28,4 +28,4 @@ outputs:
 
 runs:
   using: 'node20'
-  main: 'src/truenas-app-action.js' 
+  main: 'dist/truenas-app-action.js' 
