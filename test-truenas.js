@@ -34,9 +34,9 @@ async function commandLineTest() {
         console.log('  restart <app_name>      - Restart an app (stop then start)');
         console.log('');
         console.log('Examples:');
-        console.log('  node test-truenas.js status invoicer');
-        console.log('  node test-truenas.js restart invoicer');
-        console.log('  node test-truenas.js restart invoicer --no-ssl-verify');
+        console.log('  node test-truenas.js status app-name');
+        console.log('  node test-truenas.js restart app-name');
+        console.log('  node test-truenas.js restart app-name --no-ssl-verify');
         process.exit(1);
     }
     
@@ -108,9 +108,9 @@ if (!apiKey || !url) {
     console.log('  # export TRUENAS_URL="https://truenas.local"');
     console.log('  # export TRUENAS_API_KEY="your-api-key"');
     console.log('  # Then run:');
-    console.log('  node test-truenas.js status invoicer');
-    console.log('  node test-truenas.js restart invoicer');
-    console.log('  node test-truenas.js restart invoicer --no-ssl-verify');
+    console.log('  node test-truenas.js status app-name');
+    console.log('  node test-truenas.js restart app-name');
+    console.log('  node test-truenas.js restart app-name --no-ssl-verify');
     process.exit(1);
 }
 

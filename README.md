@@ -20,7 +20,7 @@ on:
       app_name:
         description: 'App name to restart'
         required: true
-        default: 'invoicer'
+        default: 'app-name'
 
 jobs:
   restart-app:
