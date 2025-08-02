@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Restart TrueNAS App
-        uses: gurumitts/truenas-app-action@v1
+        uses: gurumitts/truenas-app-action@v3  #use recent release
         with:
           truenas-url: ${{ secrets.TRUENAS_URL }}
           api-key: ${{ secrets.TRUENAS_API_KEY }}
@@ -35,73 +35,12 @@ jobs:
           action: 'restart'
 ```
 
-### Check App Status
-
-```yaml
-name: Check App Status
-on:
-  schedule:
-    - cron: '0 */6 * * *'  # Every 6 hours
-
-jobs:
-  check-status:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check App Status
-        uses: gurumitts/truenas-app-action@v1
-        with:
-          truenas-url: ${{ secrets.TRUENAS_URL }}
-          api-key: ${{ secrets.TRUENAS_API_KEY }}
-          app-name: 'my-app'
-          action: 'status'
-```
-
-### Manual App Control
-
-```yaml
-name: App Control
-on:
-  workflow_dispatch:
-    inputs:
-      app_name:
-        description: 'App name'
-        required: true
-      action:
-        description: 'Action to perform'
-        required: true
-        default: 'restart'
-        type: choice
-        options:
-          - status
-          - start
-          - stop
-          - restart
-
-jobs:
-  app-control:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Control App
-        id: app-control
-        uses: gurumitts/truenas-app-action@v1
-        with:
-          truenas-url: ${{ secrets.TRUENAS_URL }}
-          api-key: ${{ secrets.TRUENAS_API_KEY }}
-          app-name: ${{ github.event.inputs.app_name }}
-          action: ${{ github.event.inputs.action }}
-          disable-ssl-verify: 'false'
-
-      - name: Show Results
-        run: |
-          echo "App Status: ${{ steps.app-control.outputs.app-status }}"
-          echo "Success: ${{ steps.app-control.outputs.success }}"
-```
 
 ## Inputs
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
-| `truenas-url` | TrueNAS server URL (e.g., https://truenas.local) | Yes | - |
+| `truenas-url` | TrueNAS server URL  | Yes | - |
 | `api-key` | TrueNAS API key | Yes | - |
 | `app-name` | Name of the application to control | Yes | - |
 | `action` | Action to perform (status, stop, start, restart) | Yes | restart |
@@ -116,42 +55,17 @@ jobs:
 
 ## Setup
 
-### 1. Create API Key in TrueNAS
-
-1. Log into your TrueNAS Scale web interface
-2. Go to **Credentials** → **API Keys**
-3. Click **Add** to create a new API key
-4. Give it a name (e.g., "GitHub Actions")
-5. Select the appropriate roles (APPS_WRITE for restart operations)
-6. Copy the generated API key
+### 1. Create API Key in TrueNAS: 
+https://www.truenas.com/docs/scale/scaletutorials/toptoolbar/managingapikeys/
 
 ### 2. Add Secrets to GitHub Repository
+TRUENAS_URL: Your TrueNAS server URL
 
-Go to your GitHub repository → **Settings** → **Secrets and variables** → **Actions** and add:
-
-- `TRUENAS_URL`: Your TrueNAS server URL (e.g., `https://truenas.local`)
-- `TRUENAS_API_KEY`: The API key you created
+TRUENAS_API_KEY: The API key you created
 
 ### 3. Use the Action
 
 Add the action to your workflow as shown in the usage examples above.
-
-## SSL Certificate Issues
-
-If you encounter SSL certificate verification errors, you can disable SSL verification by setting `disable-ssl-verify: 'true'`:
-
-```yaml
-- name: Restart App
-  uses: gurumitts/truenas-app-action@v1
-  with:
-    truenas-url: ${{ secrets.TRUENAS_URL }}
-    api-key: ${{ secrets.TRUENAS_API_KEY }}
-    app-name: 'my-app'
-    action: 'restart'
-    disable-ssl-verify: 'true'
-```
-
-**Note**: Only use this option if you're using self-signed certificates and understand the security implications.
 
 ## Development
 
@@ -192,6 +106,7 @@ This creates the `dist/` directory with the bundled action.
 1. **Connection Failed**: Check your TrueNAS URL and ensure it's accessible from GitHub Actions runners
 2. **Authentication Failed**: Verify your API key has the correct permissions (APPS_WRITE role)
 3. **SSL Certificate Errors**: Use `disable-ssl-verify: 'true'` for self-signed certificates
+**Note**: Only use this option if you're using self-signed certificates and understand the security implications.
 4. **App Not Found**: Ensure the app name matches exactly what's shown in TrueNAS
 
 ### Debug Mode
@@ -200,7 +115,7 @@ To see detailed logs, you can temporarily add debug output to your workflow:
 
 ```yaml
 - name: Restart App
-  uses: gurumitts/truenas-app-action@v1
+  uses: gurumitts/truenas-app-action
   env:
     ACTIONS_STEP_DEBUG: true
   with:
