@@ -1,0 +1,49 @@
+name: Example - Check App Status
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:
+    inputs:
+      app_name:
+        description: 'App name to check'
+        required: true
+        default: 'invoicer'
+
+jobs:
+  check-status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check App Status
+        id: status
+        uses: ./
+        with:
+          truenas-url: ${{ secrets.TRUENAS_URL }}
+          api-key: ${{ secrets.TRUENAS_API_KEY }}
+          app-name: ${{ github.event.inputs.app_name || 'invoicer' }}
+          action: 'status'
+
+      - name: Show Status
+        run: |
+          echo "App Status: ${{ steps.status.outputs.app-status }}"
+          
+          case "${{ steps.status.outputs.app-status }}" in
+            "RUNNING")
+              echo "✅ App is running normally"
+              ;;
+            "STOPPED")
+              echo "⚠️ App is stopped - consider restarting"
+              ;;
+            "CRASHED")
+              echo "❌ App has crashed - immediate attention needed"
+              ;;
+            "DEPLOYING")
+              echo "⏳ App is currently deploying"
+              ;;
+            *)
+              echo "❓ Unknown app status"
+              ;;
+          esac 

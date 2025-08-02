@@ -1,0 +1,30 @@
+{
+  "name": "truenas-app-restart-action",
+  "version": "1.0.0",
+  "description": "GitHub Action to restart TrueNAS Scale applications",
+  "main": "dist/truenas-app-action.js",
+  "scripts": {
+    "build": "ncc build src/truenas-app-action.js -o dist && mv dist/index.js dist/truenas-app-action.js",
+    "test": "node test-truenas.js",
+    "test:status": "node test-truenas.js status",
+    "test:restart": "node test-truenas.js restart",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/ws": "^8.5.10",
+    "@vercel/ncc": "^0.38.1"
+  },
+  "keywords": [
+    "truenas",
+    "github-actions",
+    "websocket",
+    "api"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+} 

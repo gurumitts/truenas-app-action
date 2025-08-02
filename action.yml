@@ -1,0 +1,31 @@
+name: 'TrueNAS App Restart'
+description: 'Restart TrueNAS Scale applications via WebSocket API'
+
+inputs:
+  truenas-url:
+    description: 'TrueNAS server URL (e.g., https://truenas.local)'
+    required: true
+  api-key:
+    description: 'TrueNAS API key'
+    required: true
+  app-name:
+    description: 'Name of the application to restart'
+    required: true
+  action:
+    description: 'Action to perform (status, stop, start, restart)'
+    required: true
+    default: 'restart'
+  disable-ssl-verify:
+    description: 'Disable SSL certificate verification'
+    required: false
+    default: 'false'
+
+outputs:
+  app-status:
+    description: 'Final status of the application'
+  success:
+    description: 'Whether the action was successful'
+
+runs:
+  using: 'node20'
+  main: 'dist/truenas-app-action.js' 
