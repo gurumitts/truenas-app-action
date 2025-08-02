@@ -7,9 +7,6 @@ A GitHub Action to restart TrueNAS Scale applications via WebSocket API.
 - ✅ Restart TrueNAS Scale applications
 - ✅ Check application status
 - ✅ Start/Stop applications individually
-- ✅ SSL certificate verification options
-- ✅ Comprehensive error handling
-- ✅ Job status monitoring
 
 ## Usage
 
@@ -173,11 +170,9 @@ If you encounter SSL certificate verification errors, you can disable SSL verifi
 
 3. Test the action:
    ```bash
-   # Test status check
-   npm run test:status my-app
-
-   # Test restart
-   npm run test:restart my-app
+   Or use the test script directly with your app name:
+   node test-truenas.js status your-app-name
+   node test-truenas.js restart your-app-name
    ```
 
 ### Building

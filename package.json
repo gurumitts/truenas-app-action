@@ -6,8 +6,8 @@
   "scripts": {
     "build": "ncc build src/truenas-app-action.js -o dist && mv dist/index.js dist/truenas-app-action.js",
     "test": "node test-truenas.js",
-    "test:status": "node test-truenas.js status",
-    "test:restart": "node test-truenas.js restart",
+    "test:status": "node test-truenas.js status invoicer",
+    "test:restart": "node test-truenas.js restart invoicer",
     "prepare": "npm run build"
   },
   "dependencies": {
