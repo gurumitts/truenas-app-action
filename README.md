@@ -170,7 +170,7 @@ If you encounter SSL certificate verification errors, you can disable SSL verifi
 
 3. Test the action:
    ```bash
-   Or use the test script directly with your app name:
+   Use the test script directly with your app name:
    node test-truenas.js status your-app-name
    node test-truenas.js restart your-app-name
    ```
