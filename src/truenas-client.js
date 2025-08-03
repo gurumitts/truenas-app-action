@@ -225,10 +225,10 @@ class TrueNASClient {
     /**
      * Wait for a TrueNAS job to complete
      * @param {number} jobId - The job ID to monitor
-     * @param {number} [timeout=30000] - Timeout in milliseconds (30 seconds)
+     * @param {number} [timeout=300000] - Timeout in milliseconds (5 minutes)
      * @returns {Promise<boolean>} True if job succeeded, false if failed or timed out
      */
-    async waitForJob(jobId, timeout = 30000) {
+    async waitForJob(jobId, timeout = 300000) {
         // Validate job ID
         if (!jobId || typeof jobId !== 'number' || jobId <= 0) {
             throw new Error('Job ID must be a positive number');
