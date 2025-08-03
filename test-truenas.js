@@ -61,7 +61,7 @@ async function commandLineTest() {
     const client = new TrueNASClient(url, apiKey, { noSslVerify });
     
     try {
-        console.log('🔗 Connecting to TrueNAS...');
+        console.log('Connecting to TrueNAS...');
         await client.connect();
         
         switch (command) {

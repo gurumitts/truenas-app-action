@@ -11,8 +11,8 @@ async function run() {
         const action = core.getInput('action', { required: true });
         const noSslVerify = core.getInput('no-ssl-verify') === 'true';
 
-        core.info(`🚀 Starting TrueNAS App ${action} for: ${appName}`);
-        core.info(`🔗 Connecting to: ${truenasUrl}`);
+        core.info(`Starting TrueNAS App ${action} for: ${appName}`);
+        core.info(`Connecting to: ${truenasUrl}`);
 
         // Create client
         const client = new TrueNASClient(truenasUrl, apiKey, { 
@@ -24,36 +24,36 @@ async function run() {
 
         try {
             // Connect to TrueNAS
-            core.info('🔗 Connecting to TrueNAS...');
+            core.info('Connecting to TrueNAS...');
             await client.connect();
 
             // Execute the requested action
             switch (action) {
                 case 'status':
-                    core.info(`📊 Getting status for app: ${appName}`);
+                    core.info(`Getting status for app: ${appName}`);
                     result = await client.getAppStatus(appName);
                     core.info(`App status: ${result}`);
                     success = true;
                     break;
 
                 case 'stop':
-                    core.info(`🛑 Stopping app: ${appName}`);
+                    core.info(`Stopping app: ${appName}`);
                     await client.stopApp(appName);
-                    core.info('✅ App stop completed');
+                    core.info('App stop completed');
                     success = true;
                     break;
 
                 case 'start':
-                    core.info(`▶️ Starting app: ${appName}`);
+                    core.info(`Starting app: ${appName}`);
                     await client.startApp(appName);
-                    core.info('✅ App start completed');
+                    core.info('App start completed');
                     success = true;
                     break;
 
                 case 'restart':
-                    core.info(`🔄 Restarting app: ${appName}`);
+                    core.info(`Restarting app: ${appName}`);
                     result = await client.restartApp(appName);
-                    core.info(`✅ App restart completed. Final status: ${result}`);
+                    core.info(`App restart completed. Final status: ${result}`);
                     success = true;
                     break;
 
