@@ -2,6 +2,33 @@
 
 const { TrueNASClient } = require('./src/truenas-client');
 
+/**
+ * Validate command line inputs before connecting
+ * @param {string} command - The command to execute
+ * @param {string} appName - The app name
+ * @throws {Error} If any input is invalid
+ */
+function validateInputs(command, appName) {
+    // Validate command
+    if (!command || typeof command !== 'string') {
+        throw new Error('Command is required and must be a string');
+    }
+    
+    const validCommands = ['status', 'stop', 'start', 'restart'];
+    if (!validCommands.includes(command.toLowerCase())) {
+        throw new Error(`Invalid command: ${command}. Available commands: ${validCommands.join(', ')}`);
+    }
+    
+    // Validate app name
+    if (!appName || typeof appName !== 'string') {
+        throw new Error('App name is required and must be a string');
+    }
+    
+    if (appName.trim().length === 0) {
+        throw new Error('App name cannot be empty');
+    }
+}
+
 // Command line testing
 async function commandLineTest() {
     const args = process.argv.slice(2);
@@ -45,6 +72,9 @@ async function commandLineTest() {
         console.log(`Error: app_name is required for '${command}' command`);
         process.exit(1);
     }
+    
+    // Validate inputs before connecting
+    validateInputs(command, appName);
     
     const client = new TrueNASClient(url, apiKey, { rejectUnauthorized });
     
