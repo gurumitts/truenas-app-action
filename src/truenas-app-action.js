@@ -1,52 +1,6 @@
 const core = require('@actions/core');
 const { TrueNASClient } = require('./truenas-client');
 
-/**
- * Validate all input parameters before attempting connection
- * @param {string} truenasUrl - TrueNAS server URL
- * @param {string} apiKey - TrueNAS API key
- * @param {string} appName - Application name
- * @param {string} action - Action to perform
- * @throws {Error} If any input is invalid
- */
-function validateInputs(truenasUrl, apiKey, appName, action) {
-    // Validate TrueNAS URL
-    if (!truenasUrl || typeof truenasUrl !== 'string') {
-        throw new Error('truenas-url is required and must be a string');
-    }
-    
-    if (!truenasUrl.match(/^https?:\/\/.+/)) {
-        throw new Error('truenas-url must be a valid HTTP/HTTPS URL (e.g., https://truenas.local)');
-    }
-    
-    // Validate API key
-    if (!apiKey || typeof apiKey !== 'string') {
-        throw new Error('api-key is required and must be a string');
-    }
-    
-    if (apiKey.length < 10) {
-        throw new Error('api-key appears to be too short. Please check your TrueNAS API key');
-    }
-    
-    // Validate app name
-    if (!appName || typeof appName !== 'string') {
-        throw new Error('app-name is required and must be a string');
-    }
-    
-    if (appName.trim().length === 0) {
-        throw new Error('app-name cannot be empty');
-    }
-    
-    // Validate action
-    if (!action || typeof action !== 'string') {
-        throw new Error('action is required and must be a string');
-    }
-    
-    const validActions = ['status', 'stop', 'start', 'restart'];
-    if (!validActions.includes(action.toLowerCase())) {
-        throw new Error(`Invalid action: ${action}. Supported actions: ${validActions.join(', ')}`);
-    }
-}
 
 async function run() {
     try {
@@ -56,9 +10,6 @@ async function run() {
         const appName = core.getInput('app-name', { required: true });
         const action = core.getInput('action', { required: true });
         const noSslVerify = core.getInput('no-ssl-verify') === 'true';
-
-        // Validate inputs before connecting
-        validateInputs(truenasUrl, apiKey, appName, action);
 
         core.info(`🚀 Starting TrueNAS App ${action} for: ${appName}`);
         core.info(`🔗 Connecting to: ${truenasUrl}`);
