@@ -6,7 +6,7 @@ const { TrueNASClient } = require('./src/truenas-client');
 async function commandLineTest() {
     const args = process.argv.slice(2);
     
-    // Get API key and URL from environment variables (already validated)
+    // Get API key and URL from environment variables
     const apiKey = process.env.TRUENAS_API_KEY;
     const url = process.env.TRUENAS_URL;
 
