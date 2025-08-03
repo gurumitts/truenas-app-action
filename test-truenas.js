@@ -2,33 +2,6 @@
 
 const { TrueNASClient } = require('./src/truenas-client');
 
-/**
- * Validate command line inputs before connecting
- * @param {string} command - The command to execute
- * @param {string} appName - The app name
- * @throws {Error} If any input is invalid
- */
-function validateInputs(command, appName) {
-    // Validate command
-    if (!command || typeof command !== 'string') {
-        throw new Error('Command is required and must be a string');
-    }
-    
-    const validCommands = ['status', 'stop', 'start', 'restart'];
-    if (!validCommands.includes(command.toLowerCase())) {
-        throw new Error(`Invalid command: ${command}. Available commands: ${validCommands.join(', ')}`);
-    }
-    
-    // Validate app name
-    if (!appName || typeof appName !== 'string') {
-        throw new Error('App name is required and must be a string');
-    }
-    
-    if (appName.trim().length === 0) {
-        throw new Error('App name cannot be empty');
-    }
-}
-
 // Command line testing
 async function commandLineTest() {
     const args = process.argv.slice(2);
@@ -36,7 +9,19 @@ async function commandLineTest() {
     // Get API key and URL from environment variables (already validated)
     const apiKey = process.env.TRUENAS_API_KEY;
     const url = process.env.TRUENAS_URL;
-    
+
+    if (!apiKey || !url) {
+        console.log('Error: Required environment variables are missing');
+        if (!url) {
+            console.log('  TRUENAS_URL is required');
+            console.log('  Set it with: export TRUENAS_URL="https://truenas.local"');
+        }
+        if (!apiKey) {
+            console.log('  TRUENAS_API_KEY is required');
+            console.log('  Set it with: export TRUENAS_API_KEY="your-api-key"');
+        }
+        process.exit(1);
+    }
     // Parse command line arguments
     let command, appName;
     let noSslVerify = false;
@@ -73,9 +58,6 @@ async function commandLineTest() {
         process.exit(1);
     }
     
-    // Validate inputs before connecting
-    validateInputs(command, appName);
-    
     const client = new TrueNASClient(url, apiKey, { noSslVerify });
     
     try {
@@ -108,40 +90,6 @@ async function commandLineTest() {
     } finally {
         client.disconnect();
     }
-}
-
-// Check for required environment variables first
-const apiKey = process.env.TRUENAS_API_KEY;
-const url = process.env.TRUENAS_URL;
-
-if (!apiKey || !url) {
-    console.log('Error: Required environment variables are missing');
-    if (!url) {
-        console.log('  TRUENAS_URL is required');
-        console.log('  Set it with: export TRUENAS_URL="https://truenas.local"');
-    }
-    if (!apiKey) {
-        console.log('  TRUENAS_API_KEY is required');
-        console.log('  Set it with: export TRUENAS_API_KEY="your-api-key"');
-    }
-    console.log('');
-    console.log('Usage: node test-truenas.js <command> <app_name> [--no-ssl-verify]');
-    console.log('');
-    console.log('Commands:');
-    console.log('  status <app_name>       - Check app status');
-    console.log('  stop <app_name>         - Stop an app');
-    console.log('  start <app_name>        - Start an app');
-    console.log('  restart <app_name>      - Restart an app (stop then start)');
-    console.log('');
-    console.log('Examples:');
-    console.log('  # Set environment variables first:');
-    console.log('  # export TRUENAS_URL="https://truenas.local"');
-    console.log('  # export TRUENAS_API_KEY="your-api-key"');
-    console.log('  # Then run:');
-    console.log('  node test-truenas.js status app-name');
-    console.log('  node test-truenas.js restart app-name');
-    console.log('  node test-truenas.js restart app-name --no-ssl-verify');
-    process.exit(1);
 }
 
 // Run the command line test
