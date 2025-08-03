@@ -30691,43 +30691,11 @@ class TrueNASClient {
     }
 
     async authenticateWithAPI() {
-        // Try different authentication methods
         const authMessage = {
             id: ++this.messageId,
             msg: 'method',
             method: 'auth.login_with_api_key',
             params: [this.apiKey]
-        };
-        
-        return new Promise((resolve, reject) => {
-            this.ws.send(JSON.stringify(authMessage));
-            
-            this.ws.once('message', (data) => {
-                const response = JSON.parse(data.toString());
-                if (response.id === authMessage.id) {
-                    if (response.error) {
-                        // If API key method fails, try regular login
-                        console.log('⚠️ API key auth failed, trying alternative method...');
-                        this.tryAlternativeAuth().then(resolve).catch(reject);
-                    } else {
-                        console.log('✅ API authenticated successfully');
-                        resolve();
-                    }
-                }
-            });
-        });
-    }
-
-    async tryAlternativeAuth() {
-        // Try with username/password format (API key as password)
-        const authMessage = {
-            id: ++this.messageId,
-            msg: 'method',
-            method: 'auth.login',
-            params: [{
-                username: 'root',
-                password: this.apiKey
-            }]
         };
         
         return new Promise((resolve, reject) => {
@@ -30789,31 +30757,33 @@ class TrueNASClient {
         
         while (Date.now() - startTime < timeout) {
             try {
-                // Query job status using core.get_jobs with correct filter format
-                const jobs = await this.callMethod('core.get_jobs', [[['id', '=', jobId]]]);
-                
-                if (jobs && jobs.length > 0) {
-                    const jobStatus = jobs[0];
+                const allJobs = await this.callMethod('core.get_jobs', []);
+                const jobStatus = allJobs.find(job => job.id === jobId);
+                                                       
+                if (jobStatus) {
                     console.log(`📊 Job ${jobId} status: ${jobStatus.state}`);
                     
                     if (jobStatus.state === 'SUCCESS') {
                         console.log(`✅ Job ${jobId} completed successfully`);
                         return true;
                     } else if (jobStatus.state === 'FAILED') {
-                        console.log(`❌ Job ${jobId} failed: ${jobStatus.error}`);
+                        console.log(`❌ Job ${jobId} failed: ${jobStatus.error || 'Unknown error'}`);
                         return false;
                     } else if (jobStatus.state === 'RUNNING') {
                         if (jobStatus.progress) {
                             console.log(`📈 Job ${jobId} progress: ${jobStatus.progress.percent}% - ${jobStatus.progress.description}`);
                         }
                     }
+                } else {
+                    console.log(`⏳ Job ${jobId} status unknown, waiting...`);
                 }
                 
                 // Wait 2 seconds before checking again
                 await new Promise(resolve => setTimeout(resolve, 2000));
             } catch (error) {
                 console.error(`❌ Error checking job status: ${error.message}`);
-                return false;
+                // Continue trying on error
+                await new Promise(resolve => setTimeout(resolve, 2000));
             }
         }
         
@@ -30827,9 +30797,11 @@ class TrueNASClient {
             const jobId = await this.callMethod('app.stop', appName);
             console.log(`✅ Stop command sent successfully (Job ID: ${jobId})`);
             
-            // Wait for the job to complete (using fixed time for now)
-            console.log(`⏳ Waiting 10 seconds for stop to complete...`);
-            await new Promise(resolve => setTimeout(resolve, 10000));
+            // Wait for the job to complete
+            const success = await this.waitForJob(jobId);
+            if (!success) {
+                throw new Error('Stop operation failed or timed out');
+            }
             
             return jobId;
         } catch (error) {
@@ -30844,9 +30816,11 @@ class TrueNASClient {
             const jobId = await this.callMethod('app.start', appName);
             console.log(`✅ Start command sent successfully (Job ID: ${jobId})`);
             
-            // Wait for the job to complete (using fixed time for now)
-            console.log(`⏳ Waiting 10 seconds for start to complete...`);
-            await new Promise(resolve => setTimeout(resolve, 10000));
+            // Wait for the job to complete
+            const success = await this.waitForJob(jobId);
+            if (!success) {
+                throw new Error('Start operation failed or timed out');
+            }
             
             return jobId;
         } catch (error) {
@@ -30865,21 +30839,13 @@ class TrueNASClient {
         // Stop the app
         await this.stopApp(appName);
         
-        // Wait a bit for stop to complete
-        console.log('⏳ Waiting for app to stop...');
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        
         // Check if stopped
         const stoppedStatus = await this.getAppStatus(appName);
         console.log(`📊 App status after stop: ${stoppedStatus}`);
         
         // Start the app
         await this.startApp(appName);
-        
-        // Wait a bit for start to complete
-        console.log('⏳ Waiting for app to start...');
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        
+                
         // Check final status
         const finalStatus = await this.getAppStatus(appName);
         console.log(`📊 Final app status: ${finalStatus}`);
