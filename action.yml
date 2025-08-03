@@ -15,7 +15,7 @@ inputs:
     description: 'Action to perform (status, stop, start, restart)'
     required: true
     default: 'restart'
-  disable-ssl-verify:
+  no-ssl-verify:
     description: 'Disable SSL certificate verification'
     required: false
     default: 'false'

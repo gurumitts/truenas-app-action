@@ -44,7 +44,7 @@ jobs:
 | `api-key` | TrueNAS API key | Yes | - |
 | `app-name` | Name of the application to control | Yes | - |
 | `action` | Action to perform (status, stop, start, restart) | Yes | restart |
-| `disable-ssl-verify` | Disable SSL certificate verification | No | false |
+| `no-ssl-verify` | Disable SSL certificate verification | No | false |
 
 ## Outputs
 
@@ -105,7 +105,7 @@ This creates the `dist/` directory with the bundled action.
 
 1. **Connection Failed**: Check your TrueNAS URL and ensure it's accessible from GitHub Actions runners
 2. **Authentication Failed**: Verify your API key has the correct permissions (APPS_WRITE role)
-3. **SSL Certificate Errors**: Use `disable-ssl-verify: 'true'` for self-signed certificates
+3. **SSL Certificate Errors**: Use `no-ssl-verify: 'true'` for self-signed certificates
 **Note**: Only use this option if you're using self-signed certificates and understand the security implications.
 4. **App Not Found**: Ensure the app name matches exactly what's shown in TrueNAS
 

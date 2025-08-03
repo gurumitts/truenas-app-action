@@ -28,7 +28,7 @@ jobs:
           api-key: ${{ secrets.TRUENAS_API_KEY }}
           app-name: ${{ github.event.inputs.app_name }}
           action: 'restart'
-          disable-ssl-verify: ${{ github.event.inputs.disable_ssl }}
+          no-ssl-verify: ${{ github.event.inputs.disable_ssl }}
 
       - name: Show Results
         run: |

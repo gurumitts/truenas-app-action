@@ -30632,7 +30632,7 @@ class TrueNASClient {
      * @param {string} url - TrueNAS server URL (e.g., 'https://truenas.local')
      * @param {string} apiKey - TrueNAS API key with APPS_WRITE permissions
      * @param {Object} options - Client options
-     * @param {boolean} [options.rejectUnauthorized=true] - Whether to reject unauthorized SSL certificates
+     * @param {boolean} [options.noSslVerify=false] - Whether to disable SSL certificate verification
      */
     constructor(url, apiKey, options = {}) {
         // Validate URL format
@@ -30663,7 +30663,7 @@ class TrueNASClient {
         this.ws = null;
         this.messageId = 0;
         this.options = {
-            rejectUnauthorized: options.rejectUnauthorized !== false, // Default to true
+            noSslVerify: options.noSslVerify === true, // Default to false
             ...options
         };
     }
@@ -30680,7 +30680,7 @@ class TrueNASClient {
             // Handle SSL certificate verification
             if (this.url.startsWith('wss://')) {
                 wsOptions.agent = new https.Agent({
-                    rejectUnauthorized: this.options.rejectUnauthorized
+                    rejectUnauthorized: !this.options.noSslVerify
                 });
             }
             
@@ -30694,7 +30694,7 @@ class TrueNASClient {
             this.ws.on('error', (error) => {
                 console.error('❌ WebSocket error:', error.message);
                 if (error.message.includes('self-signed certificate') || error.message.includes('unable to verify')) {
-                    console.log('💡 Tip: Try using disable-ssl-verify=true to disable SSL certificate verification');
+                    console.log('💡 Tip: Try using no-ssl-verify=true to disable SSL certificate verification');
                 } else if (error.message.includes('ECONNREFUSED')) {
                     console.log('💡 Tip: Check if TrueNAS is running and the URL is correct');
                 } else if (error.message.includes('ENOTFOUND')) {
@@ -33040,7 +33040,7 @@ async function run() {
         const apiKey = core.getInput('api-key', { required: true });
         const appName = core.getInput('app-name', { required: true });
         const action = core.getInput('action', { required: true });
-        const disableSSLVerify = core.getInput('disable-ssl-verify') === 'true';
+        const noSslVerify = core.getInput('no-ssl-verify') === 'true';
 
         // Validate inputs before connecting
         validateInputs(truenasUrl, apiKey, appName, action);
@@ -33050,7 +33050,7 @@ async function run() {
 
         // Create client
         const client = new TrueNASClient(truenasUrl, apiKey, { 
-            rejectUnauthorized: !disableSSLVerify 
+            noSslVerify 
         });
 
         let result = null;

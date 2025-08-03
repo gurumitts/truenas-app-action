@@ -39,11 +39,11 @@ async function commandLineTest() {
     
     // Parse command line arguments
     let command, appName;
-    let rejectUnauthorized = true;
+    let noSslVerify = false;
     
     for (let i = 0; i < args.length; i++) {
         if (args[i] === '--no-ssl-verify') {
-            rejectUnauthorized = false;
+            noSslVerify = true;
         } else if (!command) {
             command = args[i];
         } else if (!appName) {
@@ -76,7 +76,7 @@ async function commandLineTest() {
     // Validate inputs before connecting
     validateInputs(command, appName);
     
-    const client = new TrueNASClient(url, apiKey, { rejectUnauthorized });
+    const client = new TrueNASClient(url, apiKey, { noSslVerify });
     
     try {
         console.log('🔗 Connecting to TrueNAS...');

@@ -55,7 +55,7 @@ async function run() {
         const apiKey = core.getInput('api-key', { required: true });
         const appName = core.getInput('app-name', { required: true });
         const action = core.getInput('action', { required: true });
-        const disableSSLVerify = core.getInput('disable-ssl-verify') === 'true';
+        const noSslVerify = core.getInput('no-ssl-verify') === 'true';
 
         // Validate inputs before connecting
         validateInputs(truenasUrl, apiKey, appName, action);
@@ -65,7 +65,7 @@ async function run() {
 
         // Create client
         const client = new TrueNASClient(truenasUrl, apiKey, { 
-            rejectUnauthorized: !disableSSLVerify 
+            noSslVerify 
         });
 
         let result = null;
