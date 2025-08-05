@@ -30687,26 +30687,26 @@ class TrueNASClient {
             this.ws = new WebSocket(this.url, wsOptions);
             
             this.ws.on('open', () => {
-                console.log('✅ Connected to TrueNAS WebSocket');
+                console.log('Connected to TrueNAS WebSocket');
                 this.authenticate().then(resolve).catch(reject);
             });
             
             this.ws.on('error', (error) => {
-                console.error('❌ WebSocket error:', error.message);
+                console.error('WebSocket error:', error.message);
                 if (error.message.includes('self-signed certificate') || error.message.includes('unable to verify')) {
-                    console.log('💡 Tip: Try using no-ssl-verify=true to disable SSL certificate verification');
+                    console.log('Tip: Try using no-ssl-verify=true to disable SSL certificate verification');
                 } else if (error.message.includes('ECONNREFUSED')) {
-                    console.log('💡 Tip: Check if TrueNAS is running and the URL is correct');
+                    console.log('Tip: Check if TrueNAS is running and the URL is correct');
                 } else if (error.message.includes('ENOTFOUND')) {
-                    console.log('💡 Tip: Check if the TrueNAS URL is correct and accessible');
+                    console.log('Tip: Check if the TrueNAS URL is correct and accessible');
                 } else if (error.message.includes('timeout')) {
-                    console.log('💡 Tip: Check network connectivity and TrueNAS server status');
+                    console.log('Tip: Check network connectivity and TrueNAS server status');
                 }
                 reject(error);
             });
             
             this.ws.on('close', () => {
-                console.log('🔌 WebSocket connection closed');
+                console.log('WebSocket connection closed');
             });
         });
     }
@@ -30731,7 +30731,7 @@ class TrueNASClient {
             this.ws.once('message', (data) => {
                 const response = JSON.parse(data.toString());
                 if (response.msg === 'connected') {
-                    console.log('✅ WebSocket connected');
+                    console.log('WebSocket connected');
                     // Now authenticate with API key
                     this.authenticateWithAPI().then(resolve).catch(reject);
                 } else {
@@ -30771,7 +30771,7 @@ class TrueNASClient {
                             reject(new Error(`Authentication failed: ${errorReason}`));
                         }
                     } else {
-                        console.log('✅ API authenticated successfully');
+                        console.log('API authenticated successfully');
                         resolve();
                     }
                 }
@@ -30833,11 +30833,11 @@ class TrueNASClient {
             return app.state;
         } catch (error) {
             if (error.message.includes('not found')) {
-                console.error(`❌ App '${appName}' not found. Please check the app name in TrueNAS`);
+                console.error(`App '${appName}' not found. Please check the app name in TrueNAS`);
             } else if (error.message.includes('permission')) {
-                console.error(`❌ Permission denied. Please ensure your API key has APPS_READ permissions`);
+                console.error(`Permission denied. Please ensure your API key has APPS_READ permissions`);
             } else {
-                console.error(`❌ Failed to get app status: ${error.message}`);
+                console.error(`Failed to get app status: ${error.message}`);
             }
             return null;
         }
@@ -30860,7 +30860,7 @@ class TrueNASClient {
             throw new Error('Timeout must be a positive number');
         }
         
-        console.log(`⏳ Waiting for job ${jobId} to complete...`);
+        console.log(`Waiting for job ${jobId} to complete...`);
         const startTime = Date.now();
         
         while (Date.now() - startTime < timeout) {
@@ -30869,33 +30869,33 @@ class TrueNASClient {
                 const jobStatus = allJobs.find(job => job.id === jobId);
                                                        
                 if (jobStatus) {
-                    console.log(`📊 Job ${jobId} status: ${jobStatus.state}`);
+                    console.log(`Job ${jobId} status: ${jobStatus.state}`);
                     
                     if (jobStatus.state === 'SUCCESS') {
-                        console.log(`✅ Job ${jobId} completed successfully`);
+                        console.log(`Job ${jobId} completed successfully`);
                         return true;
                     } else if (jobStatus.state === 'FAILED') {
-                        console.log(`❌ Job ${jobId} failed: ${jobStatus.error || 'Unknown error'}`);
+                        console.log(`Job ${jobId} failed: ${jobStatus.error || 'Unknown error'}`);
                         return false;
                     } else if (jobStatus.state === 'RUNNING') {
                         if (jobStatus.progress) {
-                            console.log(`📈 Job ${jobId} progress: ${jobStatus.progress.percent}% - ${jobStatus.progress.description}`);
+                            console.log(`Job ${jobId} progress: ${jobStatus.progress.percent}% - ${jobStatus.progress.description}`);
                         }
                     }
                 } else {
-                    console.log(`⏳ Job ${jobId} status unknown, waiting...`);
+                    console.log(`Job ${jobId} status unknown, waiting...`);
                 }
                 
                 // Wait 2 seconds before checking again
                 await new Promise(resolve => setTimeout(resolve, 2000));
             } catch (error) {
-                console.error(`❌ Error checking job status: ${error.message}`);
+                console.error(`Error checking job status: ${error.message}`);
                 // Continue trying on error
                 await new Promise(resolve => setTimeout(resolve, 2000));
             }
         }
         
-        console.log(`⏰ Job ${jobId} timed out after ${timeout}ms`);
+        console.log(`Job ${jobId} timed out after ${timeout}ms`);
         return false;
     }
 
@@ -30916,16 +30916,16 @@ class TrueNASClient {
         }
         
         // Check if app exists first
-        console.log(`🔍 Checking if app '${appName}' exists...`);
+        console.log(`Checking if app '${appName}' exists...`);
         const appStatus = await this.getAppStatus(appName);
         if (appStatus === null) {
             throw new Error(`App '${appName}' not found. Please check the app name in TrueNAS`);
         }
         
-        console.log(`🛑 Stopping app: ${appName} (current status: ${appStatus})`);
+        console.log(`Stopping app: ${appName} (current status: ${appStatus})`);
         try {
             const jobId = await this.callMethod('app.stop', appName);
-            console.log(`✅ Stop command sent successfully (Job ID: ${jobId})`);
+            console.log(`Stop command sent successfully (Job ID: ${jobId})`);
             
             // Wait for the job to complete
             const success = await this.waitForJob(jobId);
@@ -30940,10 +30940,10 @@ class TrueNASClient {
             } else if (error.message.includes('permission')) {
                 throw new Error(`Permission denied. Please ensure your API key has APPS_WRITE permissions`);
             } else if (error.message.includes('already stopped')) {
-                console.log(`ℹ️ App '${appName}' is already stopped`);
+                console.log(`App '${appName}' is already stopped`);
                 return null;
             } else {
-                console.error(`❌ Failed to stop app: ${error.message}`);
+                console.error(`Failed to stop app: ${error.message}`);
                 throw error;
             }
         }
@@ -30966,16 +30966,16 @@ class TrueNASClient {
         }
         
         // Check if app exists first
-        console.log(`🔍 Checking if app '${appName}' exists...`);
+        console.log(`Checking if app '${appName}' exists...`);
         const appStatus = await this.getAppStatus(appName);
         if (appStatus === null) {
             throw new Error(`App '${appName}' not found. Please check the app name in TrueNAS`);
         }
         
-        console.log(`▶️ Starting app: ${appName} (current status: ${appStatus})`);
+        console.log(`Starting app: ${appName} (current status: ${appStatus})`);
         try {
             const jobId = await this.callMethod('app.start', appName);
-            console.log(`✅ Start command sent successfully (Job ID: ${jobId})`);
+            console.log(`Start command sent successfully (Job ID: ${jobId})`);
             
             // Wait for the job to complete
             const success = await this.waitForJob(jobId);
@@ -30990,10 +30990,10 @@ class TrueNASClient {
             } else if (error.message.includes('permission')) {
                 throw new Error(`Permission denied. Please ensure your API key has APPS_WRITE permissions`);
             } else if (error.message.includes('already running')) {
-                console.log(`ℹ️ App '${appName}' is already running`);
+                console.log(`App '${appName}' is already running`);
                 return null;
             } else {
-                console.error(`❌ Failed to start app: ${error.message}`);
+                console.error(`Failed to start app: ${error.message}`);
                 throw error;
             }
         }
@@ -31016,27 +31016,27 @@ class TrueNASClient {
         }
         
         // Check if app exists first
-        console.log(`🔍 Checking if app '${appName}' exists...`);
+        console.log(`Checking if app '${appName}' exists...`);
         const initialStatus = await this.getAppStatus(appName);
         if (initialStatus === null) {
             throw new Error(`App '${appName}' not found. Please check the app name in TrueNAS`);
         }
         
-        console.log(`🔄 Restarting app: ${appName} (current status: ${initialStatus})`);
+        console.log(`Restarting app: ${appName} (current status: ${initialStatus})`);
         
         // Stop the app
         await this.stopApp(appName);
         
         // Check if stopped
         const stoppedStatus = await this.getAppStatus(appName);
-        console.log(`📊 App status after stop: ${stoppedStatus}`);
+        console.log(`App status after stop: ${stoppedStatus}`);
         
         // Start the app
         await this.startApp(appName);
                 
         // Check final status
         const finalStatus = await this.getAppStatus(appName);
-        console.log(`📊 Final app status: ${finalStatus}`);
+        console.log(`Final app status: ${finalStatus}`);
         
         return finalStatus;
     }
@@ -32996,8 +32996,8 @@ async function run() {
         const action = core.getInput('action', { required: true });
         const noSslVerify = core.getInput('no-ssl-verify') === 'true';
 
-        core.info(`🚀 Starting TrueNAS App ${action} for: ${appName}`);
-        core.info(`🔗 Connecting to: ${truenasUrl}`);
+        core.info(`Starting TrueNAS App ${action} for: ${appName}`);
+        core.info(`Connecting to: ${truenasUrl}`);
 
         // Create client
         const client = new TrueNASClient(truenasUrl, apiKey, { 
@@ -33009,36 +33009,36 @@ async function run() {
 
         try {
             // Connect to TrueNAS
-            core.info('🔗 Connecting to TrueNAS...');
+            core.info('Connecting to TrueNAS...');
             await client.connect();
 
             // Execute the requested action
             switch (action) {
                 case 'status':
-                    core.info(`📊 Getting status for app: ${appName}`);
+                    core.info(`Getting status for app: ${appName}`);
                     result = await client.getAppStatus(appName);
                     core.info(`App status: ${result}`);
                     success = true;
                     break;
 
                 case 'stop':
-                    core.info(`🛑 Stopping app: ${appName}`);
+                    core.info(`Stopping app: ${appName}`);
                     await client.stopApp(appName);
-                    core.info('✅ App stop completed');
+                    core.info('App stop completed');
                     success = true;
                     break;
 
                 case 'start':
-                    core.info(`▶️ Starting app: ${appName}`);
+                    core.info(`Starting app: ${appName}`);
                     await client.startApp(appName);
-                    core.info('✅ App start completed');
+                    core.info('App start completed');
                     success = true;
                     break;
 
                 case 'restart':
-                    core.info(`🔄 Restarting app: ${appName}`);
+                    core.info(`Restarting app: ${appName}`);
                     result = await client.restartApp(appName);
-                    core.info(`✅ App restart completed. Final status: ${result}`);
+                    core.info(`App restart completed. Final status: ${result}`);
                     success = true;
                     break;
 
